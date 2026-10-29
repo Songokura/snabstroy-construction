@@ -165,4 +165,19 @@
     $$('input', form).forEach(function (i) { i.addEventListener('input', function () { i.classList.remove('is-err'); }); });
   }
 
+
+  /* ---------- лента объектов: стрелки на мобильном ---------- */
+  (function () {
+    var list = $('.obj-list'), prev = $('.obj-prev'), next = $('.obj-next');
+    if (!list || !prev || !next) return;
+    function step() { var it = $('.obj', list); return it ? it.getBoundingClientRect().width + 12 : 300; }
+    function upd() {
+      var max = list.scrollWidth - list.clientWidth;
+      prev.hidden = next.hidden = max < 4;
+      prev.disabled = list.scrollLeft < 20; next.disabled = list.scrollLeft > max - 20;
+    }
+    prev.addEventListener('click', function () { list.scrollBy({ left: -step(), behavior: 'smooth' }); });
+    next.addEventListener('click', function () { list.scrollBy({ left: step(), behavior: 'smooth' }); });
+    list.addEventListener('scroll', upd, { passive: true }); window.addEventListener('resize', upd); upd();
+  })();
 })();
