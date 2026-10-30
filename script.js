@@ -148,6 +148,26 @@
     openByHash(); window.addEventListener('hashchange', openByHash);
   }
 
+  /* ---------- конверсии Google Ads ---------- */
+  var CONV = {
+    wa: 'AW-18484103813/VVXzCLTe04sdEIWV9O1E',    /* Контакт: ссылки wa.me */
+    form: 'AW-18484103813/EWa5CKjR2YsdEIWV9O1E',  /* Отправка формы */
+    tel: 'AW-18484103813/KO_fCJSo3YsdEIWV9O1E'    /* Звонок: ссылки tel: */
+  };
+  function conv(key, label) {
+    if (typeof window.gtag !== 'function') return;
+    var p = { send_to: CONV[key], value: 1.0, currency: 'USD', transport_type: 'beacon' };
+    if (label) p.event_label = label;
+    window.gtag('event', 'conversion', p);
+  }
+  window.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a) return;
+    var href = a.getAttribute('href') || '';
+    if (href.indexOf('wa.me') !== -1) conv('wa', a.getAttribute('data-wa') || 'link');
+    else if (href.indexOf('tel:') === 0) conv('tel', href);
+  }, true);
+
   /* ---------- форма -> WhatsApp ---------- */
   var form = $('#leadForm');
   if (form) {
@@ -160,6 +180,7 @@
       });
       if (!ok) { ($('#name').classList.contains('is-err') ? $('#name') : $('#phone')).focus(); return; }
       var text = t('wa.form').replace('{name}', name).replace('{phone}', phone).replace('{msg}', msg || '-');
+      conv('form', 'leadForm');
       window.open(waHref(text), '_blank', 'noopener');
     });
     $$('input', form).forEach(function (i) { i.addEventListener('input', function () { i.classList.remove('is-err'); }); });
